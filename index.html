@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="th" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMR Assessment Module (KAHIS)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="kahis-theme.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* This style block is just for Alpine's [x-cloak] utility */
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="text-sm">
+
+    <header class="bg-white dark:bg-[--color-bg-content] shadow-md p-2 flex justify-between items-center sticky top-0 z-50 dark:border-b dark:border-[--color-border-base]">
+        <div class="flex items-center space-x-4">
+            <div class="text-2xl font-bold text-green-700 px-2 flex-shrink-0" style="color: #006633;">KAHIS</div>
+            <nav class="flex items-center space-x-1 text-xs font-medium">
+                 <a href="#" class="px-3 py-2 text-gray-700 dark:text-[--color-text-base] font-semibold hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">START search HN</a>
+
+                <div class="relative group" x-data="{ open: false }">
+                    <button @click="open = !open" @keydown.escape.window="open = false" class="flex items-center px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">
+                        Registration <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+                    </button>
+                    <div x-show="open" x-cloak @click.away="open = false"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1 w-48 bg-white dark:bg-[--color-bg-content] rounded-md shadow-lg border dark:border-[--color-border-base] z-50 py-1">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Search HN</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Register List</a>
+                        <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">New Pet</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">New Owner</a>
+                        <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">CC editor</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Ref.Hos editor</a>
+                        <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Dashboard</a>
+                    </div>
+                </div>
+
+                 <div class="relative group" x-data="{ open: false }">
+                    <button @click="open = !open" @keydown.escape.window="open = false" class="flex items-center px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">
+                        Appointment <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+                    </button>
+                    <div x-show="open" x-cloak @click.away="open = false" x-transition class="absolute left-0 mt-1 w-48 bg-white dark:bg-[--color-bg-content] rounded-md shadow-lg border dark:border-[--color-border-base] z-50 py-1">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Main</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">DVM Schedule</a>
+                    </div>
+                </div>
+
+                <div class="relative group" x-data="{ open: false }">
+                    <button @click="open = !open" @keydown.escape.window="open = false" class="flex items-center px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">
+                        Cashier <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+                    </button>
+                    <div x-show="open" x-cloak @click.away="open = false" x-transition class="absolute left-0 mt-1 w-48 bg-white dark:bg-[--color-bg-content] rounded-md shadow-lg border dark:border-[--color-border-base] z-50 py-1">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Bill by List</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Bill by HN</a>
+                        <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Deposit list</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Withdraw list</a>
+                         <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Coupon list</a>
+                         <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Debt list</a>
+                         <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Receipt list</a>
+                         <hr class="my-1 border-gray-200 dark:border-[--color-border-base]">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-1m0 dark:hover:bg-[--color-bg-secondary]">Clear Lock</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Financial Report</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">Financial Report 01 log</a>
+                    </div>
+                </div>
+
+                <a href="#" class="px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">List of order</a>
+
+
+                <div class="relative group" x-data="{ open: false }">
+                    <button @click="open = !open" @keydown.escape.window="open = false" class="flex items-center px-3 py-2 text-blue-600 dark:text-[--color-primary-500] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">
+                        VR (52039575) <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+                    </button>
+                    <div x-show="open" x-cloak @click.away="open = false" x-transition class="absolute left-0 mt-1 w-48 bg-white dark:bg-[--color-bg-content] rounded-md shadow-lg border dark:border-[--color-border-base] z-50 py-1">
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">EMR</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">History diagnosis</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary]">History lab testing</a>
+                    </div>
+                </div>
+
+                <a href="#" class="px-3 py-2 text-blue-600 dark:text-[--color-primary-500] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">My Coupon</a>
+                <a href="#" class="px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">Setting</a>
+                <a href="#" class="px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">Admin</a>
+
+            </nav>
+            </div>
+
+        <div class="flex items-center space-x-3 flex-shrink-0 self-center">
+             <img src="https://placehold.co/32x32/cccccc/333333?text=User" alt="User Avatar" class="w-8 h-8 rounded object-cover flex-shrink-0">
+             <div class="text-right text-xs dark:text-[--color-text-base]">
+                <div class="-ml-1">นิพนธ์ วงศ์ประเสริฐ</div>
+                <div class="text-gray-500 dark:text-[--color-text-muted]">23 hrs 44 mins</div>
+            </div>
+            <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap h-8 flex items-center justify-center">
+                <i data-lucide="log-out" class="inline-block w-4 h-4 mr-1"></i> Log out
+            </button>
+        </div>
+    </header>
+
+    <div class="bg-gray-100 dark:bg-[--color-bg-secondary] p-2 shadow-sm flex justify-start items-center space-x-4">
+        <img src="https://placehold.co/32x32/a0aec0/4a5568?text=Pet" alt="Pet Avatar" class="w-8 h-8 rounded object-cover flex-shrink-0">
+        <div class="flex items-center space-x-4">
+             <div class="grid grid-cols-4 gap-x-4 gap-y-1 text-xs font-semibold dark:text-[--color-text-base]">
+                <div>OPD No.: <span class="text-blue-600 dark:text-[--color-primary-500]">52039575</span></div>
+                <div>ชื่อสัตว์เลี้ยง: <span class="text-blue-600 dark:text-[--color-primary-500]">คุณส้มจี๊ด(จี๊ดจ๊าด)</span></div>
+                <div>Species / Breed: <span class="text-blue-600 dark:text-[--color-primary-500]">CAT (ABYSSINIAN)</span></div>
+                <div>เจ้าของ: <span class="text-blue-600 dark:text-[--color-primary-500]">คุณพ่อส้มจี๊ด</span></div>
+                <div>Owner No.: <span class="text-blue-600 dark:text-[--color-primary-500]">W12345678</span></div>
+                 <div>Gender: <span class="text-blue-600 dark:text-[--color-primary-500]">FS</span></div>
+                 <div>Age: <span class="text-blue-600 dark:text-[--color-primary-500]">14Y 10M 19D</span></div>
+                <div>Blood Group: <span class="text-blue-600 dark:text-[--color-primary-500]">DEA 1.1 Negative</span></div>
+            </div>
+        </div>
+        <img src="https://placehold.co/32x32/cccccc/333333?text=Owner" alt="Owner Avatar" class="w-8 h-8 rounded object-cover flex-shrink-0">
+        <div class="flex space-x-3 text-xs dark:text-[--color-text-base]">
+            <label class="flex items-center"><input type="checkbox" class="mr-1"> VET</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-1" checked> KU</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-1"> VIP</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-1" checked> อื่นๆ</label>
+        </div>
+    </div>
+
+    <nav class="bg-white dark:bg-[--color-bg-content] shadow-sm -mt-px dark:border-b dark:border-[--color-border-base]">
+        <div class="max-w-full mx-auto">
+            <div class="flex space-x-1">
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Quick view</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Subj</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Obj</a>
+                
+                <a href="#" class="tab-active dark:text-[--color-primary-500] dark:border-[--color-primary-500] px-3 py-2 text-sm">Assessment</a>
+                
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Plan</a>
+                <a href="sysexam_v2.html" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Sys Exam</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order PE</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order TX</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order LIS</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order LOR</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order RX</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Lab Viewer</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Pet's Note</a>
+                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Ext Doc</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main id="emr-content-placeholder">
+        
+        </main>
+
+    <footer class="sticky bottom-0 bg-white dark:bg-[--color-bg-content] shadow-inner border-t border-gray-300 dark:border-[--color-border-base] p-3 z-40">
+        <div class="flex justify-between items-center">
+             <div class="flex space-x-2">
+                 <button id="open-df-popup" class="bg-orange-500 hover:bg-orange-600 dark:bg-[--color-orange-500] dark:hover:bg-[--color-orange-600] text-white px-4 py-2 rounded-lg text-sm font-medium">
+                     ลงข้อมูล DF
+                 </button>
+                 <button id="open-tf-popup" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                     ลงข้อมูล TF (Tech Fee)
+                 </button>
+                 <button id="open-vitals-popup" class="bg-blue-600 hover:bg-blue-700 dark:bg-[--color-primary-600] dark:hover:bg-[--color-primary-700] text-white px-4 py-2 rounded-lg text-sm font-medium">
+                     <i data-lucide="heart-pulse" class="inline-block w-4 h-4 mr-1.5"></i> Vital Signs
+                 </button>
+                 </div>
+             <div class="flex items-center space-x-4">
+                  <label for="darkmode-toggle" class="flex items-center cursor-pointer text-xs text-gray-700 dark:text-[--color-text-muted]">
+                      <input type="checkbox" id="darkmode-toggle" class="mr-1">
+                      Darkmode
+                  </label>
+                  <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                         class="bg-yellow-400 hover:bg-yellow-500 dark:bg-[--color-yellow-400] dark:hover:bg-[--color-yellow-500] text-black p-2 rounded-full shadow-lg z-20">
+                     <i data-lucide="arrow-up" class="w-5 h-5"></i>
+                 </button>
+             </div>
+         </div>
+     </footer>
+
+    <div class="bg-gray-800 dark:bg-[--color-text-base] text-gray-300 dark:text-[--color-text-muted] p-4 text-xs">
+        <div class="container mx-auto flex justify-between">
+            <div class="grid grid-cols-3 gap-x-6">
+                <a href="#" class="hover:underline">Hyperlink text to announcement 1</a>
+                <a href="#" class="hover:underline">Hyperlink text to announcement 2</a>
+                <a href="#" class="hover:underline">Hyperlink text to announcement 3</a>
+                <a href="#" class="hover:underline">Hyperlink text to announcement 1</a>
+                <a href="#" class="hover:underline">Hyperlink text to announcement 2</a>
+                <a href="#" class="hover:underline">Hyperlink text to announcement 3</a>
+            </div>
+            <div class="text-right">
+                <div>ระบบเวชระเบียนอิเล็กทรอนิกส์ โรงพยาบาลสัตว์มหาวิทยาลัยเกษตรศาสตร์</div>
+                <div>Version X.X.X.X, 31 Dec 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="df-popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-md w-full p-6 relative">
+            <button id="df-popup-close-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-[--color-text-base]">การลงข้อมูลค่า DF</h2>
+            <div class="border border-gray-300 dark:border-[--color-border-base] rounded-lg p-4 mb-5 space-y-2 text-sm dark:text-[--color-text-base]">
+                <div><strong>HN :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">52039575</span></div>
+                <div><strong>Pet Name :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">คุณส้มจี๊ด(จี๊ดจ๊าด)</span></div>
+                <div><strong>Owner Name :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">คุณพ่อส้มจี๊ด</span></div>
+                <div><strong>Date Record :</strong> <span class="font-medium">31 Dec 2025 , 23:59</span></div>
+                <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">DVM</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>Default User (DVM) login</option>
+                        <option value="user1" class="text-black dark:text-[--color-text-base]">นพพร ยงยุทธ (User A)</option>
+                        <option value="user2" class="text-black dark:text-[--color-text-base]">คุณหมอ B (User B)</option>
+                    </select>
+                </div>
+                 <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">Department</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>Default Department login</option>
+                        <option value="dep101" class="text-black dark:text-[--color-text-base]">101 อายุรกรรมทั่วไปนอกเวลา</option>
+                        <option value="dep102" class="text-black dark:text-[--color-text-base]">102 คลินิกพิเศษนอกเวลา</option>
+                        <option value="dep103" class="text-black dark:text-[--color-text-base]">103 รังสีวินิจฉัยนอกเวลา</option>
+                    </select>
+                </div>
+                 <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">Date Visit</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>31 Dec 2025 (Last)</option>
+                        <option value="2025-12-30" class="text-black dark:text-[--color-text-base]">30 Dec 2025</option>
+                        <option value="2025-12-29" class="text-black dark:text-[--color-text-base]">29 Dec 2025</option>
+                        <option value="2025-09-05" class="text-black dark:text-[--color-text-base]">5 Sep 2025</option>
+                        <option value="2024-08-27" class="text-black dark:text-[--color-text-base]">27 Aug 2024</option>
+                    </select>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-[--color-text-muted] pt-2">
+                    ก่อนลงข้อมูลโปรดตรวจสอบข้อมูลเดิมตามวันด้านบนทุกครั้ง<br>เพื่อป้องกันการลงข้อมูลซ้ำ
+                </p>
+                <p class="text-xs text-red-600 font-medium">
+                    กรณีลงข้อมูลซ้ำโปรดแจ้งการเงินเพื่อแก้ไขทันที
+                </p>
+                 <p class="text-xs text-red-600 font-medium pt-1">
+                    สามารถเข้าดูข้อมูลการบันทึกค่าใช้จ่ายในระบบของ HN นี้ได้ที่ส่วน Quick view ใน EMR module ส่วน Financial
+                </p>
+            </div>
+            <div class="space-y-3">
+                <label for="df-type" class="block font-semibold text-gray-700 dark:text-[--color-text-base]">เลือกชนิด DF</label>
+                <select id="df-type" class="w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                    <option selected disabled>DF : Select DF Type</option>
+                    <option value="type1" class="text-black dark:text-[--color-text-base]">Type 1</option>
+                    <option value="type2" class="text-black dark:text-[--color-text-base]">Type 2</option>
+                    <option value="type3" class="text-black dark:text-[--color-text-base]">Type 3</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button id="df-popup-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] dark:text-[--color-text-base] px-4 py-2 rounded-lg text-sm font-medium">
+                    ยกเลิก
+                </button>
+                <button class="bg-orange-500 hover:bg-orange-600 dark:bg-[--color-orange-500] dark:hover:bg-[--color-orange-600] text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    บันทึกการลงข้อมูล DF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tf-popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-md w-full p-6 relative">
+            <button id="tf-popup-close-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-[--color-text-base]">การลงข้อมูลค่า TF (Tech Fee)</h2>
+            <div class="border border-gray-300 dark:border-[--color-border-base] rounded-lg p-4 mb-5 space-y-2 text-sm dark:text-[--color-text-base]">
+                <div><strong>HN :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">52039575</span></div>
+                <div><strong>Pet Name :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">คุณส้มจี๊ด(จี๊ดจ๊าด)</span></div>
+                <div><strong>Owner Name :</strong> <span class="text-blue-600 dark:text-[--color-primary-500] font-medium">คุณพ่อส้มจี๊ด</span></div>
+                <div><strong>Date Record :</strong> <span class="font-medium">31 Dec 2025 , 23:59</span></div>
+                <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">Tech</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>Default User (Tech) login</option>
+                        <option value="user1" class="text-black dark:text-[--color-text-base]">นพพร ยงยุทธ (User A)</option>
+                        <option value="user2" class="text-black dark:text-[--color-text-base]">คุณ B (User B)</option>
+                    </select>
+                </div>
+                 <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">Department</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>Default Department login</option>
+                        <option value="dep101" class="text-black dark:text-[--color-text-base]">101 อายุรกรรมทั่วไปนอกเวลา</option>
+                        <option value="dep102" class="text-black dark:text-[--color-text-base]">102 คลินิกพิเศษนอกเวลา</option>
+                        <option value="dep103" class="text-black dark:text-[--color-text-base]">103 รังสีวินิจฉัยนอกเวลา</option>
+                    </select>
+                </div>
+                 <div class="flex items-center space-x-2 pt-1">
+                    <strong class="flex-shrink-0 w-20">Date Visit</strong>
+                    <select class="flex-1 w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                        <option selected disabled>31 Dec 2025 (Last)</option>
+                        <option value="2025-12-30" class="text-black dark:text-[--color-text-base]">30 Dec 2025</option>
+                        <option value="2025-12-29" class="text-black dark:text-[--color-text-base]">29 Dec 2025</option>
+                        <option value="2025-09-05" class="text-black dark:text-[--color-text-base]">5 Sep 2025</option>
+                        <option value="2024-08-27" class="text-black dark:text-[--color-text-base]">27 Aug 2024</option>
+                    </select>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-[--color-text-muted] pt-2">
+                    ก่อนลงข้อมูลโปรดตรวจสอบข้อมูลเดิมตามวันด้านบนทุกครั้ง<br>เพื่อป้องกันการลงข้อมูลซ้ำ
+                </p>
+                <p class="text-xs text-red-600 font-medium">
+                    กรณีลงข้อมูลซ้ำโปรดแจ้งการเงินเพื่อแก้ไขทันที
+                </p>
+                 <p class="text-xs text-red-600 font-medium pt-1">
+                    สามารถเข้าดูข้อมูลการบันทึกค่าใช้จ่ายในระบบของ HN นี้ได้ที่ส่วน Quick view ใน EMR module ส่วน Financial
+                </p>
+            </div>
+            <div class="space-y-3">
+                <label for="tf-type" class="block font-semibold text-gray-700 dark:text-[--color-text-base]">เลือกชนิด TF</label>
+                <select id="tf-type" class="w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] text-gray-500 dark:text-[--color-text-muted]">
+                    <option selected disabled>TF : Select TF Type</option>
+                    <option value="type1" class="text-black dark:text-[--color-text-base]">Type 1</option>
+                    <option value="type2" class="text-black dark:text-[--color-text-base]">Type 2</option>
+                    <option value="type3" class="text-black dark:text-[--color-text-base]">Type 3</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button id="tf-popup-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] dark:text-[--color-text-base] px-4 py-2 rounded-lg text-sm font-medium">
+                    ยกเลิก
+                </button>
+                <button class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    บันทึกการลงข้อมูล TF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="problem-list-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-5xl w-full p-0 relative" style="max-height: 90vh; display: flex; flex-direction: column;">
+            
+            <div class="p-4 border-b border-gray-200 dark:border-[--color-border-base] flex-shrink-0">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-[--color-text-base]">Problem List Editor</h2>
+            </div>
+            
+            <div class="p-4 overflow-y-auto"> <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-1 border border-gray-300 dark:border-[--color-border-base] rounded-lg overflow-hidden">
+                       <div class="flex border-b border-gray-200 dark:border-[--color-border-base]">
+                           <button class="flex-1 text-center py-2 px-4 text-sm font-semibold text-blue-600 dark:text-[--color-primary-500] border-b-2 border-blue-600 dark:border-[--color-primary-500]">
+                               Category
+                           </button>
+                           <button class="flex-1 text-center py-2 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                               Search
+                           </button>
+                       </div>
+                       <ul id="category-list" class="divide-y divide-gray-200 dark:divide-[--color-border-base] overflow-y-auto dark:text-[--color-text-base] h-80" style="height: 20rem;">
+                           <li data-category-id="common" class="p-3 cursor-pointer bg-gray-100 dark:bg-[rgba(139,125,107,0.15)] font-semibold">1. Common Problem</li>
+                           <li data-category-id="eye" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">2. Eye</li>
+                           <li data-category-id="ear" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">3. Ear</li>
+                           <li data-category-id="nose" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">4. Nose</li>
+                           <li data-category-id="throat" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">5. Throat</li>
+                           <li data-category-id="abdomen" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">6. Abdomen</li>
+                           <li data-category-id="trauma" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">7. Trauma</li>
+                           <li data-category-id="bone" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">8. Bone</li>
+                           <li data-category-id="behavier" class="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50">9. Behavier</li>
+                       </ul>
+                   </div>
+                   <div class="md:col-span-2 border border-gray-300 dark:border-[--color-border-base] rounded-lg overflow-hidden flex flex-col">
+                       <div class="p-2 border-b border-gray-200 dark:border-[--color-border-base] flex-shrink-0">
+                           <h3 id="result-header" class="font-semibold dark:text-[--color-text-base]">Result (0 selected)</h3>
+                       </div>
+                       <div class="overflow-y-auto" style="height: 20rem;">
+                           <table class="w-full text-left text-sm table-fixed">
+                               <thead class="border-b border-gray-200 dark:border-[--color-border-base] sticky top-0">
+                                   <tr>
+                                       <th class="p-3 w-[10%] dark:bg-[--color-bg-secondary] dark:text-[--color-text-base]"><input type="checkbox"></th>
+                                       <th class="p-3 font-semibold w-[60%] dark:bg-[--color-bg-secondary] dark:text-[--color-text-base]">Term</th>
+                                       <th class="p-3 font-semibold w-[30%] dark:bg-[--color-bg-secondary] dark:text-[--color-text-base]">TAG</th>
+                                   </tr>
+                               </thead>
+                               <tbody id="result-table-body" class="divide-y divide-gray-200 dark:divide-[--color-border-base] dark:text-[--color-text-base]">
+                                   </tbody>
+                           </table>
+                       </div>
+                   </div>
+                </div>
+            </div> <div class="flex justify-between items-center p-4 border-t border-gray-200 dark:border-[--color-border-base] mt-2 flex-shrink-0">
+                <button id="problem-list-popup-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] dark:text-[--color-text-base] px-4 py-2 rounded-lg text-sm font-medium">
+                    Close
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 dark:bg-[--color-green-600] dark:hover:bg-[--color-green-700] text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    Confirm Problem List Selection
+                </button>
+            </div>
+            
+            <button id="problem-list-popup-close-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+        </div>
+    </div>
+    
+    <div id="vitals-popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 md:p-8 z-[100] hidden">
+        <div class="max-w-7xl w-full mx-auto bg-[var(--color-bg-content)] rounded-lg shadow-lg overflow-hidden border border-[var(--color-border-base)] flex flex-col" style="max-height: 90vh;">
+
+            <header class="relative flex justify-between items-center p-6 border-b border-[var(--color-border-base)] flex-shrink-0">
+                <div>
+                    <h1 class="text-2xl font-bold text-[var(--color-text-base)]">การประเมิน Vital Signs</h1>
+                </div>
+                <button id="close-vitals-popup-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </header>
+
+            <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+
+                <aside class="w-full lg:w-72 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-border-base)] bg-[var(--color-bg-secondary)] overflow-y-auto">
+                    <nav class="flex lg:flex-col" aria-label="Tabs">
+                        
+                        <button id="tab-history" class="tab-link tab-active w-1/2 lg:w-full text-left px-6 py-4 text-sm font-medium" data-tab="history">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="history" class="w-5 h-5"></i>
+                                <span>History</span>
+                            </div>
+                            <span class="text-xs block text-[var(--color-text-muted)] mt-1 ml-8">ประวัติ Vital signs</span>
+                        </button>
+                        
+                        <button id="tab-current" class="tab-link tab-inactive w-1/2 lg:w-full text-left px-6 py-4 text-sm font-medium" data-tab="current">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                                <span>Current Vital Signs</span>
+                            </div>
+                            <span class="text-xs block text-[var(--color-text-muted)] mt-1 ml-8">บันทึกข้อมูล Vital signs ปัจจุบัน</span>
+                        </button>
+                        
+                    </nav>
+                </aside>
+
+                <main class="w-full flex-1 overflow-y-auto">
+
+                    <div id="content-history" class="tab-content h-full flex flex-col p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-5 flex-shrink-0">
+                            <h2 class="text-xl font-semibold flex items-center text-[var(--color-text-base)]">
+                                <i data-lucide="history" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                ประวัติ Vital Signs
+                            </h2>
+                            <div class="flex space-x-2">
+                                <button id="bp-chart-btn" class="flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] dark:bg-[var(--color-primary-600)] dark:hover:bg-[var(--color-primary-700)] transition-colors text-sm font-medium">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                                    <span>BP Chart</span>
+                                </button>
+                                <button id="vitals-chart-btn" class="flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] dark:bg-[var(--color-primary-600)] dark:hover:bg-[var(--color-primary-700)] transition-colors text-sm font-medium">
+                                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                                    <span>Vital Signs Chart</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="rounded-lg border border-[var(--color-border-base)] shadow-sm overflow-auto flex-1">
+                            <table id="historyTable" class="min-w-full text-sm"> 
+                                <thead class="bg-[var(--color-bg-secondary)]">
+                                    <tr>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime">
+                                            <div class="flex items-center">
+                                                Date/Time
+                                                <span class="sort-icon desc">
+                                                    <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="bp">BP (mmHg)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pulse">Pulse (bpm)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="rr">RR (rpm)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="temp">Temp (°F)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fbs">FBS (mg/dL)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="crt">CRT (sec)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="mucous">Mucous</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="lung">Lung</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="heart">Heart</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="loc">L.O.C</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pain">Pain</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="cyanosis">Cyanosis</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="seizure">Seizure</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="arrest">Arrest</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="note">Note</th>
+                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody" class="divide-y divide-[var(--color-border-base)] bg-[var(--color-bg-content)]">
+                                    </tbody>
+                            </table>
+                        </div>
+                        <div id="noHistoryMessage" class="hidden text-center p-8 text-[var(--color-text-muted)]">
+                            <i data-lucide="folder-clock" class="w-12 h-12 mx-auto mb-4"></i>
+                            <p>No vital sign history found.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="content-current" class="tab-content hidden space-y-4 p-6 md:p-8">
+                        
+                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                            <div class="flex justify-between items-center mb-5">
+                                <h2 class="text-xl font-semibold flex items-center text-[var(--color-text-base)]">
+                                    <i data-lucide="heart-pulse" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                    Vital Signs (สัญญาณชีพ)
+                                </h2>
+                                <button class="flex items-center space-x-1 text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors">
+                                    <i data-lucide="x" class="w-3 h-3"></i>
+                                    <span>Clear</span>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="vs-bp" class="form-label">BP (mmHg)</label>
+                                    <input type="text" id="vs-bp" class="form-input" placeholder="e.g. 120/80">
+                                </div>
+                                <div>
+                                    <label for="vs-pulse" class="form-label">Pulse (bpm)</label>
+                                    <input type="text" id="vs-pulse" class="form-input" placeholder="e.g. 72">
+                                </div>
+                                <div>
+                                    <label for="vs-rr" class="form-label">RR (rpm)</label>
+                                    <input type="text" id="vs-rr" class="form-input" placeholder="e.g. 18">
+                                </div>
+                                <div>
+                                    <label for="vs-temp" class="form-label">Temp (°F)</label>
+                                    <input type="text" id="vs-temp" class="form-input" placeholder="e.g. 98.6">
+                                </div>
+                                <div>
+                                    <label for="vs-fbs" class="form-label">FBS (mg/dL)</label>
+                                    <input type="text" id="vs-fbs" class="form-input" placeholder="e.g. 100">
+                                </div>
+                                <div>
+                                    <label for="vs-crt" class="form-label">CRT (sec)</label>
+                                    <input type="text" id="vs-crt" class="form-input" placeholder="e.g. <2">
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            
+                            <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm md:col-span-2">
+                                <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
+                                    <i data-lucide="alert-triangle" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                    Critical Events
+                                </h2>
+                                <div class="flex flex-col space-y-4">
+                                    <div class="flex items-center">
+                                        <input id="check-cyanosis" type="checkbox" class="form-checkbox">
+                                        <label for="check-cyanosis" class="ml-3 block text-sm text-[var(--color-text-base)]">Cyanosis</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="check-seizure" type="checkbox" class="form-checkbox">
+                                        <label for="check-seizure" class="ml-3 block text-sm text-[var(--color-text-base)]">Seizure</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="check-arrest" type="checkbox" class="form-checkbox">
+                                        <label for="check-arrest" class="ml-3 block text-sm text-[var(--color-text-base)]">Arrest</label>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm md:col-span-3">
+                                <div class="flex justify-between items-center mb-5">
+                                    <h2 class="text-xl font-semibold flex items-center text-[var(--color-text-base)]">
+                                        <i data-lucide="user-check" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                        General (การประเมินทั่วไป)
+                                    </h2>
+                                    <button class="flex items-center space-x-1 text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                        <span>Clear</span>
+                                    </button>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="w-3/5">
+                                        <label for="mucous-dropdown" class="form-label">Mucous Membrane</label>
+                                        <select id="mucous-dropdown" class="form-input form-select">
+                                            <option value="" selected disabled class="form-select-placeholder">Select</option>
+                                            <option value="Normal">Normal (Pink and Moist)</option>
+                                            <option value="Pale">Pale or White</option>
+                                            <option value="Yellow">Yellow</option>
+                                            <option value="Blue">Blue or Muddy</option>
+                                            <option value="Dry">Dry or tacky</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-3/5">
+                                        <label for="lung-dropdown" class="form-label">Lung Sound</label>
+                                        <select id="lung-dropdown" class="form-input form-select">
+                                            <option value="" selected disabled class="form-select-placeholder">Select</option>
+                                            <option value="Normal">Normal</option>
+                                            <option value="Wheeze">Wheeze</option>
+                                            <option value="Crackles">Crackles</option>
+                                            <option value="Rhonchi">Rhonchi</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-3/5">
+                                        <label for="heart-dropdown" class="form-label">Heart Sound</label>
+                                        <select id="heart-dropdown" class="form-input form-select">
+                                            <option value="" selected disabled class="form-select-placeholder">Select</option>
+                                            <option value="Normal">Normal</option>
+                                            <option value="Murmur">Murmur</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-3/5">
+                                        <label for="gcs-dropdown" class="form-label">Level of Consciousness</label>
+                                        <select id="gcs-dropdown" class="form-input form-select">
+                                            <option value="" selected disabled class="form-select-placeholder">Select</option>
+                                            <option value="E4V5M6">E4V5M6 - Alert and Oriented</option>
+                                            <option value="E3V4M5">E3V4M5 - Confused</option>
+                                            <option value="E2V3M4">E2V3M4 - Drowsy</option>
+                                            <option value="E1V1M1">E1V1M1 - Unresponsive</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-3/5">
+                                        <label for="pain-score-dropdown" class="form-label">Pain Score (0-10)</label>
+                                        <select id="pain-score-dropdown" class="form-input form-select">
+                                            <option value="" selected disabled class="form-select-placeholder">Select</option>
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                            <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
+                                <i data-lucide="activity" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                Note (บันทึก)
+                            </h2>
+                            <div>
+                                <textarea id="system-review-notes" rows="4" class="form-input" placeholder="พิมพ์ข้อความสั้นๆ"></textarea>
+                            </div>
+                        </section>
+
+                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                            <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
+                                <i data-lucide="calendar-clock" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                Record Date/Time
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="vs-date" class="form-label">Date</label>
+                                    <input type="date" id="vs-date" class="form-input form-input-datetime" placeholder="Current date/time" required>
+                                </div>
+                                <div>
+                                    <label for="vs-time" class="form-label">Time</label>
+                                    <input type="time" id="vs-time" class="form-input form-input-datetime" placeholder="Current date/time" required>
+                                </div>
+                            </div>
+                        </section>
+                        </div>
+
+                </main>
+            </div>
+
+            <footer class="flex-shrink-0 flex justify-between items-center p-4 border-t border-[var(--color-border-base)] bg-[var(--color-bg-secondary)]">
+                <button id="close-vitals-popup-cancel" class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-[var(--color-border-base)] dark:hover:bg-[var(--color-border-base)] text-gray-700 dark:text-[var(--color-text-base)] text-sm font-medium">
+                    Close
+                </button>
+                <button class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-[var(--color-green-600)] text-white hover:bg-[var(--color-green-700)] dark:bg-[var(--color-green-600)] dark:hover:bg-[var(--color-green-700)] transition-colors text-sm font-medium">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>Save Vital Signs</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+    
+    <script>
+        lucide.createIcons();
+    </js>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
