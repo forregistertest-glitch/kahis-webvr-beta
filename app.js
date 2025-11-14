@@ -292,6 +292,7 @@ function initializeDrawingDemo(templateUrl) {
 
     const canvasElement = document.getElementById('drawing-canvas');
     const container = canvasElement.parentElement; // div ที่ครอบ canvas
+    if (!container) return; // Add check
 
     // สร้าง canvas
     fabricCanvas = new fabric.Canvas('drawing-canvas', {
@@ -318,7 +319,7 @@ function initializeDrawingDemo(templateUrl) {
     const textBtn = document.getElementById('text-mode-btn');
     const colorPicker = document.getElementById('drawing-color-picker');
 
-    penBtn.onclick = () => {
+    if (penBtn) penBtn.onclick = () => {
         fabricCanvas.isDrawingMode = true;
         drawingMode = 'pen';
         penBtn.classList.add('bg-blue-600', 'text-white');
@@ -326,7 +327,7 @@ function initializeDrawingDemo(templateUrl) {
         textBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
     };
     
-    textBtn.onclick = () => {
+    if (textBtn) textBtn.onclick = () => {
         fabricCanvas.isDrawingMode = false;
         drawingMode = 'text';
         textBtn.classList.add('bg-blue-600', 'text-white');
@@ -357,7 +358,7 @@ function initializeDrawingDemo(templateUrl) {
     });
 
     // Listener สำหรับเปลี่ยนสี
-    colorPicker.onchange = () => {
+    if (colorPicker) colorPicker.onchange = () => {
         const color = colorPicker.value;
         fabricCanvas.freeDrawingBrush.color = color;
         // (ถ้ามี object ที่เลือกอยู่ ก็เปลี่ยนสี object นั้น)
@@ -784,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryData = {
         "common": [ { term: "Depressed", tags: "TAG A, TAG B" }, { term: "Loss of appetile", tags: "TAG A, TAG C" }, { term: "Acute Vomitting", tags: "TAG B, TAG D" }, { term: "Chronic Vomitting", tags: "TAG B, TAG E" }, { term: "Respiratory distress", tags: "TAG F" }, { term: "Lameness", tags: "TAG G" }, { term: "Dental tartar", tags: "TAG H" } ],
         "eye": [ { term: "Corneal ulcer", tags: "Eye, Trauma" }, { term: "Glaucoma", tags: "Eye, Chronic" }, { term: "Uveitis", tags: "Eye, Inflammation" }, { term: "Cataract", tags: "Eye, Age" } ],
-        "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term:m: "Aural hematoma", tags: "Ear, Trauma" } ],
+        "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term: "Aural hematoma", tags: "Ear, Trauma" } ],
         "nose": [ { term: "Nasal discharge", tags: "Nose, Symptom" }, { term: "Sneezing", tags: "Nose, Symptom" } ],
         "throat": [ { term: "Coughing", tags: "Throat, Symptom" }, { term: "Pharyngitis", tags: "Throat, Inflammation" } ],
         "abdomen": [ { term: "Abdominal pain", tags: "Abdomen, Symptom" }, { term: "Diarrhea", tags: "Abdomen, GI" }, { term: "Foreign body", tags: "Abdomen, GI" } ],
