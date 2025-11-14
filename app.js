@@ -1,13 +1,13 @@
-// This is app.js (ฉบับแก้ไขสมบูรณ์)
+// This is app.js (ฉบับแก้ไขสมบูรณ์ - ตัวเต็ม)
 
 // ***** START: DRAWING DEMO FUNCTIONS *****
 let fabricCanvas = null;
 let drawingHistory = []; // สำหรับ Undo
 let drawingLock = false; // ป้องกันการ Undo/Clear ระหว่างทำงาน
 
-// (ฟังก์ชันนี้จะถูกย้ายเข้าไปใน initializeDrawingDemo)
 function saveDrawingState() {
     if (drawingLock) return;
+    // บันทึกสถานะปัจจุบันของ canvas
     drawingHistory.push(JSON.stringify(fabricCanvas.toJSON()));
 }
 
@@ -24,7 +24,7 @@ function initializeDrawingDemo(templateUrl) {
     // สร้าง canvas
     fabricCanvas = new fabric.Canvas('drawing-canvas', {
         width: container.clientWidth,
-        height: container.clientWidth, // เริ่มต้นด้วยสี่เหลี่ยมจัตุรัส
+        height: container.clientWidth, // เริ่มต้นด้วยสี่เหลี่ยมจัตุรัส (จะถูกปรับขนาดเมื่อโหลดภาพ)
         isDrawingMode: true,
     });
     
@@ -338,16 +338,18 @@ function openVitalsChart(historyData) {
     chartWindow.document.close();
 }
 
-// ***** START: EYE EXAM HISTORY DATA (DEMO) *****
+// ***** START: EYE EXAM HISTORY DATA (MODIFIED) *****
 const eyeExamHistoryData = [
-    { datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '+', menace_os: '+', stt_od: 15, stt_os: 14, iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/eee/888?text=Exam+Sheet+1' },
-    { datetimeSort: '2025-12-30T14:00:00', datetime: '30 Dec 2025 14:00', dvm: 'Dr. See', plr_od: 'Sluggish', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '-', menace_os: '+', stt_od: 10, stt_os: 12, iop_od: 22, iop_os: 20, fluorescein_od: 'Positive', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ddd/777?text=Exam+Sheet+2+(Corneal+Ulcer+OD)' },
+    { datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '+', menace_os: '+', stt_od: 15, stt_os: 14, iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'eyeexam.png' },
+    { datetimeSort: '2025-12-30T14:00:00', datetime: '30 Dec 2025 14:00', dvm: 'Dr. See', plr_od: 'Sluggish', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '-', menace_os: '+', stt_od: 10, stt_os: 12, iop_od: 22, iop_os: 20, fluorescein_od: 'Positive', fluorescein_os: 'Neg', imageUrl: 'eyeexam.png' },
     { datetimeSort: '2025-12-29T11:00:00', datetime: '29 Dec 2025 11:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: null, dazzle_os: null, menace_od: '+', menace_os: '+', stt_od: null, stt_os: null, iop_od: 17, iop_os: 17, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: null },
-    { datetimeSort: '2025-12-28T16:00:00', datetime: '28 Dec 2025 16:00', dvm: 'Dr. See', plr_od: '-', plr_os: 'Sluggish', palpebral_od: '+', palpebral_os: '+', dazzle_od: '-', dazzle_os: 'Sluggish', menace_od: '-', menace_os: '-', stt_od: 5, stt_os: 8, iop_od: 45, iop_os: 25, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ccc/666?text=Exam+Sheet+3+(Glaucoma+OD)' }
+    { datetimeSort: '2025-12-28T16:00:00', datetime: '28 Dec 2025 16:00', dvm: 'Dr. See', plr_od: '-', plr_os: 'Sluggish', palpebral_od: '+', palpebral_os: '+', dazzle_od: '-', dazzle_os: 'Sluggish', menace_od: '-', menace_os: '-', stt_od: 5, stt_os: 8, iop_od: 45, iop_os: 25, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'eyeexam.png' },
+    { datetimeSort: '2025-12-27T10:00:00', datetime: '27 Dec 2025 10:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '+', menace_os: '+', stt_od: 16, stt_os: 15, iop_od: 19, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'eyeexam.png' },
+    { datetimeSort: '2025-12-26T15:00:00', datetime: '26 Dec 2025 15:00', dvm: 'Dr. See', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: null, dazzle_os: null, menace_od: null, menace_os: null, stt_od: 14, stt_os: 15, iop_od: 20, iop_os: 20, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: null }
 ];
-// ***** END: EYE EXAM HISTORY DATA (DEMO) *****
+// ***** END: EYE EXAM HISTORY DATA (MODIFIED) *****
 
-// ***** START: EYE EXAM HISTORY FUNCTIONS *****
+// ***** START: EYE EXAM HISTORY FUNCTIONS (MODIFIED) *****
 function renderEyeExamHistoryTable(data) {
     const tableBody = document.getElementById('eyeHistoryTableBody');
     if (!tableBody) return;
@@ -362,27 +364,28 @@ function renderEyeExamHistoryTable(data) {
         const row = document.createElement('tr');
         row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50');
         
+        // (MODIFIED) เปลี่ยน N/A เป็น '' และใช้ eyeexam.png
         const imageUrl = item.imageUrl 
             ? `<img src="${item.imageUrl}" alt="Exam" class="history-thumbnail" data-full-src="${item.imageUrl}">`
-            : '<span class="text-[var(--color-text-muted)]">N/A</span>';
+            : ''; // <-- เปลี่ยน 'N/A' เป็น ''
             
         row.innerHTML = `
             <td class="p-3 sticky left-0">${item.datetime}</td>
             <td class="p-3">${item.dvm}</td>
-            <td class="p-3">${item.plr_od || 'N/A'}</td>
-            <td class="p-3">${item.plr_os || 'N/A'}</td>
-            <td class="p-3">${item.palpebral_od || 'N/A'}</td>
-            <td class="p-3">${item.palpebral_os || 'N/A'}</td>
-            <td class="p-3">${item.dazzle_od || 'N/A'}</td>
-            <td class="p-3">${item.dazzle_os || 'N/A'}</td>
-            <td class="p-3">${item.menace_od || 'N/A'}</td>
-            <td class="p-3">${item.menace_os || 'N/A'}</td>
-            <td class="p-3">${item.stt_od || 'N/A'}</td>
-            <td class="p-3">${item.stt_os || 'N/A'}</td>
-            <td class="p-3">${item.fluorescein_od || 'N/A'}</td>
-            <td class="p-3">${item.fluorescein_os || 'N/A'}</td>
-            <td class="p-3">${item.iop_od || 'N/A'}</td>
-            <td class="p-3">${item.iop_os || 'N/A'}</td>
+            <td class="p-3">${item.plr_od || ''}</td>
+            <td class="p-3">${item.plr_os || ''}</td>
+            <td class="p-3">${item.palpebral_od || ''}</td>
+            <td class="p-3">${item.palpebral_os || ''}</td>
+            <td class="p-3">${item.dazzle_od || ''}</td>
+            <td class="p-3">${item.dazzle_os || ''}</td>
+            <td class="p-3">${item.menace_od || ''}</td>
+            <td class="p-3">${item.menace_os || ''}</td>
+            <td class="p-3">${item.stt_od || ''}</td>
+            <td class="p-3">${item.stt_os || ''}</td>
+            <td class="p-3">${item.fluorescein_od || ''}</td>
+            <td class="p-3">${item.fluorescein_os || ''}</td>
+            <td class="p-3">${item.iop_od || ''}</td>
+            <td class="p-3">${item.iop_os || ''}</td>
             <td class="p-3">${imageUrl}</td>
             <td class="p-3">
                 <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]" title="View/Edit">
@@ -402,7 +405,7 @@ function renderEyeExamHistoryTable(data) {
         lucide.createIcons();
     }
 }
-// ***** END: EYE EXAM HISTORY FUNCTIONS *****
+// ***** END: EYE EXAM HISTORY FUNCTIONS (MODIFIED) *****
 
 
 
@@ -571,15 +574,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (eyeHistoryTableBody) {
         eyeHistoryTableBody.addEventListener('click', function(event) {
+            // เช็คว่ากดที่รูป thumbnail (ที่มี class 'history-thumbnail')
             if (event.target.classList.contains('history-thumbnail')) {
-                fullImageViewerSrc.src = event.target.dataset.fullSrc; 
-                imageViewerModal.classList.remove('hidden'); 
+                fullImageViewerSrc.src = event.target.dataset.fullSrc; // ใช้ data-full-src
+                imageViewerModal.classList.remove('hidden'); // แสดง modal
             }
         });
     }
     if (closeImageViewerX) closeImageViewerX.addEventListener('click', hideImageViewer);
     if (imageViewerModal) imageViewerModal.addEventListener('click', (event) => {
-        if (event.target === imageViewerModal) hideImageViewer(); 
+        if (event.target === imageViewerModal) hideImageViewer(); // ปิดเมื่อคลิกพื้นหลัง
     });
 
 
@@ -890,7 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // **** START: Vital Signs Internal Script (Merged) ****
     // This logic is for elements *inside* the modal, so it can be initialized once.
     
-    // --- History Table Logic (Vital Signs) ---
+    // --- History Table Logic (Vital Signs) (MODIFIED) ---
     const vsHistoryData = [
         { id: 1, datetimeSort: '2025-12-31T17:00:00', datetime: '31 Dec 2025 17:00', bp: '140/90', pulse: 92, hr: 95, rr: 22, temp: 100.5, fbs: 150, crt: '<2', mucous: 'Pale', pulse_quality: 'Weak', lung: 'Crackles', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Post-seizure.' },
         { id: 2, datetimeSort: '2025-12-31T13:00:00', datetime: '31 Dec 2025 13:00', bp: '100/60', pulse: 120, hr: 120, rr: 28, temp: 97.0, fbs: 80, crt: '>2', mucous: 'Blue', pulse_quality: 'Thready', lung: 'Wheeze', heart: 'Normal', loc: 'E1V1M1', pain: 10, cyanosis: true, seizure: false, arrest: true, note: 'Code Blue.' },
@@ -899,19 +903,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 5, datetimeSort: '2025-12-30T17:00:00', datetime: '30 Dec 2025 17:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 100, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
         { id: 6, datetimeSort: '2025-12-30T13:00:00', datetime: '30 Dec 2025 13:00', bp: '124/82', pulse: 76, hr: 80, rr: 18, temp: 99.0, fbs: 98, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: 'Agitated.' },
         { id: 7, datetimeSort: '2025-12-30T09:00:00', datetime: '30 Dec 2025 09:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 112, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 8, datetimeSort: '2025-12-29T21:00:00', datetime: '29 Dec 2025 21:00', bp: '118/78', pulse: 70, hr: null, rr: 18, temp: 98.4, fbs: 108, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 8, datetimeSort: '2025-12-29T21:00:00', datetime: '29 Dec 2025 21:00', bp: '118/78', pulse: null, hr: null, rr: 18, temp: 98.4, fbs: 108, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
         { id: 9, datetimeSort: '2025-12-29T17:00:00', datetime: '29 Dec 2025 17:00', bp: '130/85', pulse: 80, hr: 80, rr: 20, temp: 99.1, fbs: 120, crt: '2', mucous: 'Dry', pulse_quality: 'Bounding', lung: 'Rhonchi', heart: 'Normal', loc: 'E3V4M5', pain: 5, cyanosis: true, seizure: false, arrest: false, note: 'Episode of SOB.' },
-        { id: 10, datetimeSort: '2025-12-29T13:00:00', datetime: '29 Dec 2025 13:00', bp: '122/80', pulse: 74, hr: 75, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 11, datetimeSort: '2025-12-29T09:00:00', datetime: '29 Dec 2025 09:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 12, datetimeSort: '2025-12-28T21:00:00', datetime: '28 Dec 2025 21:00', bp: '116/76', pulse: 68, hr: null, rr: 18, temp: 98.2, fbs: 103, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 13, datetimeSort: '2025-12-28T17:00:00', datetime: '28 Dec 2025 17:00', bp: '118/78', pulse: 70, hr: 70, rr: 18, temp: 98.5, fbs: 105, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 14, datetimeSort: '2025-12-28T13:00:00', datetime: '28 Dec 2025 13:00', bp: '120/80', pulse: 72, hr: 74, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 15, datetimeSort: '2025-12-28T09:00:00', datetime: '28 Dec 2025 09:00', bp: '122/80', pulse: 75, hr: 75, rr: 18, temp: 98.7, fbs: 111, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 16, datetimeSort: '2025-12-27T21:00:00', datetime: '27 Dec 2025 21:00', bp: '140/90', pulse: 90, hr: 90, rr: 22, temp: 100.4, fbs: 140, crt: '<2', mucous: 'Pale', pulse_quality: 'Weak', lung: 'Normal', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Seizure event, post-ictal.' },
-        { id: 17, datetimeSort: '2025-12-27T17:00:00', datetime: '27 Dec 2025 17:00', bp: '130/85', pulse: 82, hr: 85, rr: 20, temp: 99.0, fbs: 125, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Restless.' },
-        { id: 18, datetimeSort: '2025-12-27T13:00:00', datetime: '27 Dec 2025 13:00', bp: '128/84', pulse: 80, hr: 80, rr: 18, temp: 98.8, fbs: 122, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 19, datetimeSort: '2025-12-27T09:00:00', datetime: '27 Dec 2025 09:00', bp: '126/82', pulse: 78, hr: null, rr: 18, temp: 98.6, fbs: 118, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 20, datetimeSort: '2025-12-26T21:00:00', datetime: '26 Dec 2025 21:00', bp: '124/80', pulse: 76, hr: 78, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Admission.' },
+        { id: 10, datetimeSort: '2025-12-29T13:00:00', datetime: '29 Dec 2025 13:00', bp: '122/80', pulse: 74, hr: 75, rr: 18, temp: 98.6, fbs: null, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
     ];
 
     const vsTableBody = document.getElementById('historyTableBody');
@@ -940,28 +934,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const cyanosisText = item.cyanosis ? '<span class="font-semibold text-[var(--color-danger)]">Yes</span>' : '<span class="text-[var(--color-text-muted)]">No</span>';
             const seizureText = item.seizure ? '<span class="font-semibold text-[var(--color-danger)]">Yes</span>' : '<span class="text-[var(--color-text-muted)]">No</span>';
             const arrestText = item.arrest ? '<span class="font-semibold text-[var(--color-danger)]">Yes</span>' : '<span class="text-[var(--color-text-muted)]">No</span>';
-            const noteSnippet = item.note.length > 20 ? item.note.substring(0, 20) + '...' : item.note;
+            const noteSnippet = (item.note && item.note.length > 20) ? item.note.substring(0, 20) + '...' : (item.note || '');
 
             const row = `
                 <tr>
                     <td class="text-[var(--color-text-base)] sticky left-0">${item.datetime}</td>
-                    <td class="text-[var(--color-text-base)]">${item.bp}</td>
-                    <td class="text-[var(--color-text-base)]">${item.pulse}</td>
-                    <td class="text-[var(--color-text-base)]">${item.hr || 'N/A'}</td>
-                    <td class="text-[var(--color-text-base)]">${item.rr}</td>
-                    <td class="text-[var(--color-text-base)]">${item.temp}</td>
-                    <td class="text-[var(--color-text-base)]">${item.fbs}</td>
-                    <td class="text-[var(--color-text-base)]">${item.crt}</td>
-                    <td class="text-[var(--color-text-base)]">${item.mucous}</td>
-                    <td class="text-[var(--color-text-base)]">${item.pulse_quality || 'N/A'}</td>
-                    <td class="text-[var(--color-text-base)]">${item.lung}</td>
-                    <td class="text-[var(--color-text-base)]">${item.heart}</td>
-                    <td class="text-[var(--color-text-base)]">${item.loc}</td>
-                    <td class="text-[var(--color-text-base)]">${item.pain}</td>
+                    <td class="text-[var(--color-text-base)]">${item.bp || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.pulse || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.hr || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.rr || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.temp || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.fbs || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.crt || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.mucous || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.pulse_quality || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.lung || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.heart || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.loc || ''}</td>
+                    <td class="text-[var(--color-text-base)]">${item.pain || ''}</td>
                     <td class="text-center">${cyanosisText}</td>
                     <td class="text-center">${seizureText}</td>
                     <td class="text-center">${arrestText}</td>
-                    <td class="text-[var(--color-text-muted)]" title="${item.note}">${noteSnippet}</td>
+                    <td class="text-[var(--color-text-muted)]" title="${item.note || ''}">${noteSnippet}</td>
                     <td class="text-[var(--color-text-base)]">
                         <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]" title="View/Edit">
                             <i data-lucide="more-vertical" class="w-4 h-4"></i>
@@ -995,19 +989,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             }
             if (['pulse', 'hr', 'rr', 'temp', 'pain', 'fbs'].includes(column)) {
+                // Handle nulls for numeric sort
+                valA = valA === null ? (direction === 'asc' ? Infinity : -Infinity) : valA;
+                valB = valB === null ? (direction === 'asc' ? Infinity : -Infinity) : valB;
                 return direction === 'asc' ? valA - valB : valB - valA;
             }
             if (['cyanosis', 'seizure', 'arrest'].includes(column)) {
                  return direction === 'asc' ? (valA === valB ? 0 : valA ? 1 : -1) : (valA === valB ? 0 : valA ? -1 : 1);
             }
-            if (typeof valA === 'string') {
-                valA = valA.toLowerCase();
-                valB = valB.toLowerCase();
-            }
+            // Handle nulls for string sort
+            valA = valA === null ? '' : String(valA).toLowerCase();
+            valB = valB === null ? '' : String(valB).toLowerCase();
+
             if (column === 'crt') {
                 valA = valA.toString().replace('<', '0').replace('>', '9');
                 valB = valB.toString().replace('<', '0').replace('>', '9');
-                return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             }
             if (valA < valB) {
                 return direction === 'asc' ? -1 : 1;
@@ -1056,6 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Initial render
         sortVsData(vsCurrentSort.column, vsCurrentSort.direction); 
         renderVsHistoryTable(vsHistoryData);
         vsHistoryHeaders.forEach(header => {

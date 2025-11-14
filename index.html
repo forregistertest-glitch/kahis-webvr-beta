@@ -33,6 +33,57 @@
         .history-thumbnail:hover {
             transform: scale(1.1);
         }
+        
+        /* ***** NEW: BUG FIX for Eye Exam History Table Sticky Header/Column ***** */
+        #eyeHistoryTable th, #eyeHistoryTable td {
+            padding: 12px 16px;
+            white-space: nowrap; 
+        }
+        #eyeHistoryTable th {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 600;
+        }
+         #eyeHistoryTable th:hover {
+            background-color: var(--color-border-base);
+         }
+        #eyeHistoryTable tbody tr {
+            border-bottom: 1px solid var(--color-border-base);
+            transition: background-color 0.2s;
+        }
+        #eyeHistoryTable tbody tr:last-child {
+            border-bottom: none;
+        }
+        #eyeHistoryTable tbody tr:hover {
+            background-color: var(--color-bg-secondary);
+        }
+        
+        #eyeHistoryTable thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10; /* Lower z-index for header */
+            background-color: var(--color-bg-secondary);
+        }
+        #eyeHistoryTable th:first-child,
+        #eyeHistoryTable td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: var(--color-bg-content); 
+        }
+        #eyeHistoryTable th:first-child {
+            z-index: 20; /* Higher z-index for corner */
+            background-color: var(--color-bg-secondary); 
+        }
+         #eyeHistoryTable tbody tr:hover td:first-child {
+            background-color: var(--color-bg-secondary); 
+         }
+         #eyeHistoryTable th:first-child, #eyeHistoryTable td:first-child {
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+         }
+         .dark #eyeHistoryTable th:first-child, .dark #eyeHistoryTable td:first-child {
+            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.2);
+         }
+         /* ***** END: BUG FIX ***** */
     </style>
 </head>
 <body class="text-sm">
@@ -609,7 +660,7 @@
                                             <option value="" selected disabled class="form-select-placeholder">Select</option>
                                             <option value="Normal">Normal (Pink and Moist)</option>
                                             <option value="Pale">Pale or White</option>
-                                            <option value="Yellow">Yellow</option>
+                                            <option valuea="Yellow">Yellow</option>
                                             <option value="Blue">Blue or Muddy</option>
                                             <option value="Dry">Dry or tacky</option>
                                         </select>
@@ -758,8 +809,8 @@
                             <table id="eyeHistoryTable" class="min-w-full text-sm">
                                 <thead class="bg-[var(--color-bg-secondary)]">
                                     <tr>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime">Date/Time</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="dvm">DVM</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime" style="width: 160px;">Date/Time</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="dvm" style="width: 120px;">DVM</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="plr_od">PLR (OD)</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="plr_os">PLR (OS)</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="palpebral_od">Palpebral (OD)</th>
@@ -774,7 +825,7 @@
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fluorescein_os">Fluorescein (OS)</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="iop_od">IOP (OD)</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="iop_os">IOP (OS)</th>
-                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Image</th>
+                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]" style="width: 80px;">Image</th>
                                         <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
                                     </tr>
                                 </thead>
