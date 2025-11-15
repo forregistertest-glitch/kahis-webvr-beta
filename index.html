@@ -206,28 +206,43 @@
         </div>
     </div>
 
+<!-- ... โค้ดเดิม (ส่วน Pet Info Bar) ... -->
+    </div>
+
     <nav class="bg-white dark:bg-[--color-bg-content] shadow-sm -mt-px dark:border-b dark:border-[--color-border-base]">
         <div class="max-w-full mx-auto">
             <div class="flex space-x-1">
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Quick view</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Subj</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Obj</a>
+                <!-- 
+                  VVV START: ส่วนที่แก้ไข VVV
+                  เหตุผล: เพิ่ม class="emr-tab" และ data-target="...html" 
+                  เพื่อให้ JavaScript (app.js) สามารถจับการคลิกและรู้ว่าต้องโหลดไฟล์ใด 
+                -->
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="quick_view_content.html">Quick view</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="subj_content.html">Subj</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="obj_content.html">Obj</a>
                 
-                <a href="#" class="tab-active dark:text-[--color-primary-500] dark:border-[--color-primary-500] px-3 py-2 text-sm">Assessment</a>
+                <a href="#" class="tab-active emr-tab dark:text-[--color-primary-500] dark:border-[--color-primary-500] px-3 py-2 text-sm" data-target="assessment_content.html">Assessment</a>
                 
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Plan</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="plan_content.html">Plan</a>
+                
+                <!-- ลิงก์นี้เป็นลิงก์ปกติ (ไม่ใช่ module) จึงไม่ต้องเพิ่ม data-target -->
                 <a href="sysexam_v2.html" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Sys Exam</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order PE</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order TX</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order LIS</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order LOR</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Order RX</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Lab Viewer</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Pet's Note</a>
-                <a href="#" class="tab-inactive dark:text-[--color-text-muted] px-3 py-2 text-sm">Ext Doc</a>
+                
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_pe_content.html">Order PE</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_tx_content.html">Order TX</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_lis_content.html">Order LIS</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_lor_content.html">Order LOR</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_rx_content.html">Order RX</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="lab_viewer_content.html">Lab Viewer</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="pets_note_content.html">Pet's Note</a>
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="ext_doc_content.html">Ext Doc</a>
+                <!-- 
+                  ^^^ END: ส่วนที่แก้ไข ^^^
+                -->
             </div>
         </div>
     </nav>
+<!-- ... โค้ดเดิม (ส่วน Footer) ... -->
     
     <main id="emr-content-placeholder">
         </main>

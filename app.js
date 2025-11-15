@@ -415,33 +415,325 @@ function renderEyeExamHistoryTable(data) {
 // ***** END: EYE EXAM HISTORY FUNCTIONS (MODIFIED) *****
 
 
+// +++ START: EMR Tab Switching Logic (NEW - MOVED TO GLOBAL SCOPE) +++
+
+// (นี่คือเวอร์ชันแก้ไขล่าสุด ที่มีการดักจับ Error 2 ชั้น)
+async function loadModuleContent(contentFile) {
+    const contentPlaceholder = document.getElementById('emr-content-placeholder');
+    if (!contentPlaceholder) {
+        console.error('Error: emr-content-placeholder not found.');
+        return;
+    }
+    
+    // จัดการกรณีที่ data-target ไม่มีค่า (เช่น ลิงก์ Sys Exam ที่เป็น href)
+    if (!contentFile || contentFile === 'undefined' || contentFile === '#') {
+        contentPlaceholder.innerHTML = ''; // ล้างเนื้อหาถ้า target ไม่ถูกต้อง
+        return;
+    }
+
+    // --- Block 1: Fetching Content ---
+    let html = '';
+    try {
+        const response = await fetch('./' + contentFile); // (ใช้ './' patch)
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.warn(`Module content not found: ${contentFile}`);
+                contentPlaceholder.innerHTML = `<div class="p-4"><p class="text-gray-700 dark:text-[--color-text-base]">Module content not found (404): ${contentFile}</p></div>`;
+            } else {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+            return; // หยุดถ้า fetch ล้มเหลว
+        }
+        html = await response.text();
+        contentPlaceholder.innerHTML = html;
+
+    } catch (error) {
+        // --- นี่คือ Error ตอนดึงไฟล์ ---
+        console.error('Error during FETCH:', error);
+        contentPlaceholder.innerHTML = `<p class="p-4 text-red-600">Error: Could not FETCH module (${contentFile}). Check network or file path.</p>`;
+        return; // หยุดถ้า fetch ล้มเหลว
+    }
+
+    // --- Block 2: Initializing Scripts for the Content ---
+    try {
+        // (สำคัญมาก) เรียกใช้สคริปต์สำหรับโมดูลนั้นๆ
+        if (contentFile === 'assessment_content.html') {
+            initializeAssessmentScripts(); 
+        } else if (contentFile === 'ext_doc_content.html') {
+            // ไฟล์ใหม่ของเรา (ext_doc_content.html) ไม่มี JS ที่ต้องรัน
+        }
+        // ... (เพิ่มเงื่อนไขสำหรับโมดูลอื่นๆ ในอนาคต) ...
+
+        // เรียก Lucide icons ใหม่ทุกครั้งที่เปลี่ยนเนื้อหา
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (initError) {
+        // --- นี่คือ Error ตอนรันสคริปต์ (เช่น initializeAssessmentScripts) ---
+        console.error(`Error during INITIALIZATION of ${contentFile}:`, initError);
+        // แสดง Error ใหม่เป็นสีเหลืองทับลงไป
+        contentPlaceholder.innerHTML += `<p class="p-4 text-yellow-600 bg-yellow-100 rounded-b-lg border-t border-yellow-200">Warning: Module loaded, but its scripts failed to initialize. Error: ${initError.message}</p>`;
+    }
+}
+
+// (ฟังก์ชันนี้ถูกย้ายออกมาอยู่นอก DOMContentLoaded)
+function initializeTabSwitching() {
+    const emrTabs = document.querySelectorAll('.emr-tab');
+    
+    emrTabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetFile = this.dataset.target;
+
+            // 1. โหลดเนื้อหาใหม่
+            loadModuleContent(targetFile);
+
+            // 2. อัปเดต UI ของ Tab
+            emrTabs.forEach(t => {
+                // จัดการลิงก์ที่ไม่มี data-target (เช่น sysexam_v2.html)
+                if (t.href && !t.dataset.target) {
+                    t.classList.remove('tab-active');
+                    t.classList.add('tab-inactive');
+                } else if (t.dataset.target) {
+                     t.classList.replace('tab-active', 'tab-inactive');
+                }
+            });
+            this.classList.replace('tab-inactive', 'tab-active');
+        });
+    });
+}
+// +++ END: EMR Tab Switching Logic (NEW - MOVED TO GLOBAL SCOPE) +++
+
+
+// +++ START: Assessment-related Functions (NEW - MOVED TO GLOBAL SCOPE) +++
+// (ฟังก์ชัน 3 ตัวนี้ ถูกย้ายออกมาจาก DOMContentLoaded)
+
+// --- Copy to Clipboard Function (ย้ายออกมา Global) ---
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed'; 
+    textarea.style.opacity = 0;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        return true;
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+        return false;
+    } finally {
+        document.body.removeChild(textarea);
+    }
+}
+
+// --- Show Copy Message Function (ย้ายออกมา Global) ---
+function showCopyMessage(msgElement) {
+    if (msgElement) {
+        msgElement.classList.remove('hidden');
+        setTimeout(() => {
+            msgElement.classList.add('hidden');
+        }, 1500); 
+    }
+}
+// --- Initialization function for dynamically loaded content (ย้ายออกมา Global) ---
+function initializeAssessmentScripts() {
+    
+    // --- Problem List Modal (Dynamic Content) ---
+    const openProblemListBtn = document.getElementById('open-problem-list-modal');
+    const problemListModal = document.getElementById('problem-list-modal'); 
+    const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); 
+    const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); 
+    
+    const showProblemListPopup = () => { if (problemListModal) problemListModal.classList.remove('hidden'); };
+    const hideProblemListPopup = () => { if (problemListModal) problemListModal.classList.add('hidden'); };
+    
+    if (openProblemListBtn) openProblemListBtn.addEventListener('click', showProblemListPopup);
+    
+    // (FIX: เพิ่มการตรวจสอบ dataset.listenerAttached ก่อนเพิ่ม Event)
+    if (closeProblemListBtnX && !closeProblemListBtnX.dataset.listenerAttached) {
+        closeProblemListBtnX.addEventListener('click', hideProblemListPopup);
+        closeProblemListBtnX.dataset.listenerAttached = 'true';
+    }
+    if (cancelProblemListBtn && !cancelProblemListBtn.dataset.listenerAttached) {
+        cancelProblemListBtn.addEventListener('click', hideProblemListPopup);
+        cancelProblemListBtn.dataset.listenerAttached = 'true';
+    }
+    if (problemListModal && !problemListModal.dataset.listenerAttached) {
+        problemListModal.addEventListener('click', (event) => { 
+            if (event.target === problemListModal) hideProblemListPopup(); 
+        });
+        problemListModal.dataset.listenerAttached = 'true';
+    }
+
+    // --- Copy to Clipboard (Dynamic Content) ---
+    const copyAssessmentBtn = document.getElementById('copy-assessment-note-btn');
+    const assessmentContent = document.getElementById('assessment-note-content');
+    const assessmentMsg = document.getElementById('copy-msg-assessment');
+    const copyProblemBtn = document.getElementById('copy-problem-list-btn');
+    const problemContent = document.getElementById('problem-list-content');
+    const problemMsg = document.getElementById('copy-msg-problem');
+    const copyDiagnosisBtn = document.getElementById('copy-diagnosis-btn');
+    const diagnosisContent = document.getElementById('diagnosis-content');
+    const diagnosisMsg = document.getElementById('copy-msg-diagnosis');
+
+    if (copyAssessmentBtn && assessmentContent) {
+        copyAssessmentBtn.addEventListener('click', () => {
+            const textToCopy = assessmentContent.innerText || assessmentContent.textContent;
+            if (copyToClipboard(textToCopy)) {
+                showCopyMessage(assessmentMsg);
+            }
+        });
+    }
+    if (copyProblemBtn && problemContent) {
+        copyProblemBtn.addEventListener('click', () => {
+            const textToCopy = problemContent.innerText || problemContent.textContent;
+            if (copyToClipboard(textToCopy)) {
+                showCopyMessage(problemMsg);
+            }
+        });
+    }
+    if (copyDiagnosisBtn && diagnosisContent) {
+        copyDiagnosisBtn.addEventListener('click', () => {
+            const textToCopy = diagnosisContent.innerText || diagnosisContent.textContent;
+            if (copyToClipboard(textToCopy)) {
+                showCopyMessage(diagnosisMsg);
+            }
+        });
+    }
+
+    // --- Assessment History Table Sort (Dynamic Content) ---
+    const assessmentHistoryTableBody = document.getElementById('assessment-history-table-body');
+    const assessmentHistoryHeaders = document.querySelectorAll('#assessment-history-table th[data-sort]');
+    let assessmentHistoryData = [
+        { datetime: '2025-12-31 20:00', datetimeStr: '31 Dec 2025 20:00', dvm: 'AAA', department: '201' },
+        { datetime: '2025-12-31 19:00', datetimeStr: '31 Dec 2025 19:00', dvm: 'BBB', department: '201' },
+        { datetime: '2025-12-31 18:00', datetimeStr: '31 Dec 2025 18:00', dvm: 'CCC', department: '201' },
+        { datetime: '2025-12-31 09:00', datetimeStr: '31 Dec 2025 09:00', dvm: 'AAA', department: '101' },
+        { datetime: '2025-12-30 20:00', datetimeStr: '30 Dec 2025 20:00', dvm: 'AAA', department: '201' },
+        { datetime: '2025-12-25 16:00', datetimeStr: '25 Dec 2025 16:00', dvm: 'CCC', department: '101' },
+        { datetime: '2025-12-20 19:00', datetimeStr: '20 Dec 2025 19:00', dvm: 'BBB', department: '201' },
+        { datetime: '2025-12-20 13:00', datetimeStr: '20 Dec 2025 13:00', dvm: 'CCC', department: '101' },
+        { datetime: '2025-12-10 11:00', datetimeStr: '10 Dec 2025 11:00', dvm: 'AAA', department: '101' },
+        { datetime: '2025-12-04 14:00', datetimeStr: '04 Dec 2025 14:00', dvm: 'AAA', department: '101' }
+    ];
+    let assessmentCurrentSort = { column: 'datetime', direction: 'desc' }; 
+
+    function renderAssessmentHistoryTable(data) {
+        if (!assessmentHistoryTableBody) return;
+        assessmentHistoryTableBody.innerHTML = ''; 
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50', 'cursor-pointer');
+            if (item.datetime === '2025-12-31 20:00') {
+                 row.classList.add('bg-blue-50', 'dark:bg-blue-900/20');
+            }
+            row.innerHTML = `
+                <td class="p-3 ${item.datetime === '2025-12-31 20:00' ? 'text-blue-600 dark:text-[--color-primary-500]' : ''}">${item.datetimeStr}</td>
+                <td class="p-3">${item.dvm}</td>
+                <td class="p-3">${item.department}</td>
+            `;
+            assessmentHistoryTableBody.appendChild(row);
+        });
+    }
+
+    function sortAssessmentData(column, direction) {
+        assessmentHistoryData.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+            if (column === 'datetime') {
+                valA = a.datetime;
+                valB = b.datetime;
+            } else if (column === 'department') {
+                valA = parseInt(a.department, 10);
+                valB = parseInt(b.department, 10);
+            }
+            let comparison = 0;
+            if (valA > valB) {
+                comparison = 1;
+            } else if (valA < valB) {
+                comparison = -1;
+            }
+            if (comparison === 0 && column !== 'datetime') {
+                 let dateA = a.datetime;
+                 let dateB = b.datetime;
+                 if (dateA > dateB) comparison = -1;
+                 else if (dateA < dateB) comparison = 1;
+            }
+            return direction === 'asc' ? comparison : comparison * -1;
+        });
+    }
+
+    function updateAssessmentSortUI(activeHeader) {
+        assessmentHistoryHeaders.forEach(header => {
+            header.classList.remove('sort-active');
+            const icon = header.querySelector('.sort-icon');
+            if (icon) icon.setAttribute('data-lucide', 'arrow-up-down'); 
+        });
+        activeHeader.classList.add('sort-active');
+        const activeIcon = activeHeader.querySelector('.sort-icon');
+        if (activeIcon) {
+            activeIcon.setAttribute('data-lucide', assessmentCurrentSort.direction === 'asc' ? 'arrow-up' : 'arrow-down');
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons(); 
+        }
+    }
+
+    if (assessmentHistoryHeaders.length > 0) {
+        assessmentHistoryHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const sortColumn = header.dataset.sort;
+                if (assessmentCurrentSort.column === sortColumn) {
+                    assessmentCurrentSort.direction = assessmentCurrentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    assessmentCurrentSort.column = sortColumn;
+                    assessmentCurrentSort.direction = sortColumn === 'datetime' ? 'desc' : 'asc';
+                }
+                sortAssessmentData(assessmentCurrentSort.column, assessmentCurrentSort.direction);
+                renderAssessmentHistoryTable(assessmentHistoryData);
+                updateAssessmentSortUI(header);
+            });
+        });
+        sortAssessmentData(assessmentCurrentSort.column, assessmentCurrentSort.direction); 
+        renderAssessmentHistoryTable(assessmentHistoryData);
+        assessmentHistoryHeaders.forEach(header => {
+            if (header.dataset.sort === assessmentCurrentSort.column) {
+                 updateAssessmentSortUI(header);
+            }
+        });
+    }
+} // End of initializeAssessmentScripts()
+// +++ END: Assessment-related Functions (NEW - MOVED TO GLOBAL SCOPE) +++
+
+
+// --- Problem List Modal (Tagging Section - Global Data) ---
+// (ย้ายออกมา Global Scope)
+const categoryData = {
+    "common": [ { term: "Depressed", tags: "TAG A, TAG B" }, { term: "Loss of appetile", tags: "TAG A, TAG C" }, { term: "Acute Vomitting", tags: "TAG B, TAG D" }, { term: "Chronic Vomitting", tags: "TAG B, TAG E" }, { term: "Respiratory distress", tags: "TAG F" }, { term: "Lameness", tags: "TAG G" }, { term: "Dental tartar", tags: "TAG H" } ],
+    "eye": [ { term: "Corneal ulcer", tags: "Eye, Trauma" }, { term: "Glaucoma", tags: "Eye, Chronic" }, { term: "Uveitis", tags: "Eye, Inflammation" }, { term: "Cataract", tags: "Eye, Age" } ],
+    "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term: "Aural hematoma", tags: "Ear, Trauma" } ],
+    "nose": [ { term: "Nasal discharge", tags: "Nose, Symptom" }, { term: "Sneezing", tags: "Nose, Symptom" } ],
+    "throat": [ { term: "Coughing", tags: "Throat, Symptom" }, { term: "Pharyngitis", tags: "Throat, Inflammation" } ],
+    "abdomen": [ { term: "Abdominal pain", tags: "Abdomen, Symptom" }, { term: "Diarrhea", tags: "Abdomen, GI" }, { term: "Foreign body", tags: "Abdomen, GI" } ],
+    "trauma": [ { term: "Laceration", tags: "Trauma, Skin" }, { term: "Hit by car", tags: "Trauma, HBC" } ],
+    "bone": [ { term: "Fracture", tags: "Bone, Trauma" }, { term: "Arthritis", tags: "Bone, Chronic" } ],
+    "behavier": [ { term: "Aggression", tags: "Behavior" }, { term: "Anxiety", tags: "Behavior" } ]
+};
+
 
 // --- Main DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- (DEMO) Load assessment_content.html into main placeholder ---
-    const contentPlaceholder = document.getElementById('emr-content-placeholder');
-    if (contentPlaceholder) {
-        fetch('assessment_content.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(html => {
-                contentPlaceholder.innerHTML = html;
-                initializeAssessmentScripts(); // <--- This function is crucial
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            })
-            .catch(error => {
-                console.error('Error loading assessment content:', error);
-                contentPlaceholder.innerHTML = '<p class="p-4 text-red-600">Error: Could not load assessment module content.</p>';
-            });
-    }
-
+    // +++ START: EMR Tab Loading Logic (NEW) +++
+    initializeTabSwitching();
+    
+    // Load the initial content (Assessment)
+    const activeTab = document.querySelector('.emr-tab.tab-active');
+    const initialContent = activeTab ? activeTab.dataset.target : 'assessment_content.html';
+    loadModuleContent(initialContent || 'assessment_content.html');
+    // +++ END: EMR Tab Loading Logic (NEW) +++
     
     // --- Dark Mode ---
     const toggle = document.getElementById('darkmode-toggle');
@@ -643,7 +935,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // --- Tab Switching Logic (Vital Signs) ---
     vitalsTabLinks.forEach(link => {
         link.addEventListener('click', () => {
@@ -663,8 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    // --- Tab Switching Logic (Eye Exam) (NEW) ---
+// --- Tab Switching Logic (Eye Exam) (NEW) ---
     eyeTabLinks.forEach(link => {
         link.addEventListener('click', () => {
             const tabId = link.dataset.tab; // e.g., "eye-history"
@@ -684,216 +974,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Copy to Clipboard Function ---
-    function copyToClipboard(text) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed'; 
-        textarea.style.opacity = 0;
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            return true;
-        } catch (err) {
-            console.error('Fallback: Oops, unable to copy', err);
-            return false;
-        } finally {
-            document.body.removeChild(textarea);
-        }
-    }
-
-    function showCopyMessage(msgElement) {
-        if (msgElement) {
-            msgElement.classList.remove('hidden');
-            setTimeout(() => {
-                msgElement.classList.add('hidden');
-            }, 1500); 
-        }
-    }
-
-    // --- Initialization function for dynamically loaded content ---
-    function initializeAssessmentScripts() {
-        
-        // --- Problem List Modal (Dynamic Content) ---
-        const openProblemListBtn = document.getElementById('open-problem-list-modal');
-        const problemListModal = document.getElementById('problem-list-modal'); 
-        const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); 
-        const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); 
-        
-        const showProblemListPopup = () => { if (problemListModal) problemListModal.classList.remove('hidden'); };
-        const hideProblemListPopup = () => { if (problemListModal) problemListModal.classList.add('hidden'); };
-        
-        if (openProblemListBtn) openProblemListBtn.addEventListener('click', showProblemListPopup);
-        
-        if (closeProblemListBtnX && !closeProblemListBtnX.dataset.listenerAttached) {
-            closeProblemListBtnX.addEventListener('click', hideProblemListPopup);
-            closeProblemListBtnX.dataset.listenerAttached = 'true';
-        }
-        if (cancelProblemListBtn && !cancelProblemListBtn.dataset.listenerAttached) {
-            cancelProblemListBtn.addEventListener('click', hideProblemListPopup);
-            cancelProblemListBtn.dataset.listenerAttached = 'true';
-        }
-        if (problemListModal && !problemListModal.dataset.listenerAttached) {
-            problemListModal.addEventListener('click', (event) => { 
-                if (event.target === problemListModal) hideProblemListPopup(); 
-            });
-            problemListModal.dataset.listenerAttached = 'true';
-        }
-
-        // --- Copy to Clipboard (Dynamic Content) ---
-        const copyAssessmentBtn = document.getElementById('copy-assessment-note-btn');
-        const assessmentContent = document.getElementById('assessment-note-content');
-        const assessmentMsg = document.getElementById('copy-msg-assessment');
-        const copyProblemBtn = document.getElementById('copy-problem-list-btn');
-        const problemContent = document.getElementById('problem-list-content');
-        const problemMsg = document.getElementById('copy-msg-problem');
-        const copyDiagnosisBtn = document.getElementById('copy-diagnosis-btn');
-        const diagnosisContent = document.getElementById('diagnosis-content');
-        const diagnosisMsg = document.getElementById('copy-msg-diagnosis');
-
-        if (copyAssessmentBtn && assessmentContent) {
-            copyAssessmentBtn.addEventListener('click', () => {
-                const textToCopy = assessmentContent.innerText || assessmentContent.textContent;
-                if (copyToClipboard(textToCopy)) {
-                    showCopyMessage(assessmentMsg);
-                }
-            });
-        }
-        if (copyProblemBtn && problemContent) {
-            copyProblemBtn.addEventListener('click', () => {
-                const textToCopy = problemContent.innerText || problemContent.textContent;
-                if (copyToClipboard(textToCopy)) {
-                    showCopyMessage(problemMsg);
-                }
-            });
-        }
-        if (copyDiagnosisBtn && diagnosisContent) {
-            copyDiagnosisBtn.addEventListener('click', () => {
-                const textToCopy = diagnosisContent.innerText || diagnosisContent.textContent;
-                if (copyToClipboard(textToCopy)) {
-                    showCopyMessage(diagnosisMsg);
-                }
-            });
-        }
-
-        // --- Assessment History Table Sort (Dynamic Content) ---
-        const assessmentHistoryTableBody = document.getElementById('assessment-history-table-body');
-        const assessmentHistoryHeaders = document.querySelectorAll('#assessment-history-table th[data-sort]');
-        let assessmentHistoryData = [
-            { datetime: '2025-12-31 20:00', datetimeStr: '31 Dec 2025 20:00', dvm: 'AAA', department: '201' },
-            { datetime: '2025-12-31 19:00', datetimeStr: '31 Dec 2025 19:00', dvm: 'BBB', department: '201' },
-            { datetime: '2025-12-31 18:00', datetimeStr: '31 Dec 2025 18:00', dvm: 'CCC', department: '201' },
-            { datetime: '2025-12-31 09:00', datetimeStr: '31 Dec 2025 09:00', dvm: 'AAA', department: '101' },
-            { datetime: '2025-12-30 20:00', datetimeStr: '30 Dec 2025 20:00', dvm: 'AAA', department: '201' },
-            { datetime: '2025-12-25 16:00', datetimeStr: '25 Dec 2025 16:00', dvm: 'CCC', department: '101' },
-            { datetime: '2025-12-20 19:00', datetimeStr: '20 Dec 2025 19:00', dvm: 'BBB', department: '201' },
-            { datetime: '2025-12-20 13:00', datetimeStr: '20 Dec 2025 13:00', dvm: 'CCC', department: '101' },
-            { datetime: '2025-12-10 11:00', datetimeStr: '10 Dec 2025 11:00', dvm: 'AAA', department: '101' },
-            { datetime: '2025-12-04 14:00', datetimeStr: '04 Dec 2025 14:00', dvm: 'AAA', department: '101' }
-        ];
-        let assessmentCurrentSort = { column: 'datetime', direction: 'desc' }; 
-
-        function renderAssessmentHistoryTable(data) {
-            if (!assessmentHistoryTableBody) return;
-            assessmentHistoryTableBody.innerHTML = ''; 
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50', 'cursor-pointer');
-                if (item.datetime === '2025-12-31 20:00') {
-                     row.classList.add('bg-blue-50', 'dark:bg-blue-900/20');
-                }
-                row.innerHTML = `
-                    <td class="p-3 ${item.datetime === '2025-12-31 20:00' ? 'text-blue-600 dark:text-[--color-primary-500]' : ''}">${item.datetimeStr}</td>
-                    <td class="p-3">${item.dvm}</td>
-                    <td class="p-3">${item.department}</td>
-                `;
-                assessmentHistoryTableBody.appendChild(row);
-            });
-        }
-
-        function sortAssessmentData(column, direction) {
-            assessmentHistoryData.sort((a, b) => {
-                let valA = a[column];
-                let valB = b[column];
-                if (column === 'datetime') {
-                    valA = a.datetime;
-                    valB = b.datetime;
-                } else if (column === 'department') {
-                    valA = parseInt(a.department, 10);
-                    valB = parseInt(b.department, 10);
-                }
-                let comparison = 0;
-                if (valA > valB) {
-                    comparison = 1;
-                } else if (valA < valB) {
-                    comparison = -1;
-                }
-                if (comparison === 0 && column !== 'datetime') {
-                     let dateA = a.datetime;
-                     let dateB = b.datetime;
-                     if (dateA > dateB) comparison = -1;
-                     else if (dateA < dateB) comparison = 1;
-                }
-                return direction === 'asc' ? comparison : comparison * -1;
-            });
-        }
-
-        function updateAssessmentSortUI(activeHeader) {
-            assessmentHistoryHeaders.forEach(header => {
-                header.classList.remove('sort-active');
-                const icon = header.querySelector('.sort-icon');
-                if (icon) icon.setAttribute('data-lucide', 'arrow-up-down'); 
-            });
-            activeHeader.classList.add('sort-active');
-            const activeIcon = activeHeader.querySelector('.sort-icon');
-            if (activeIcon) {
-                activeIcon.setAttribute('data-lucide', assessmentCurrentSort.direction === 'asc' ? 'arrow-up' : 'arrow-down');
-            }
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons(); 
-            }
-        }
-
-        if (assessmentHistoryHeaders.length > 0) {
-            assessmentHistoryHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const sortColumn = header.dataset.sort;
-                    if (assessmentCurrentSort.column === sortColumn) {
-                        assessmentCurrentSort.direction = assessmentCurrentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        assessmentCurrentSort.column = sortColumn;
-                        assessmentCurrentSort.direction = sortColumn === 'datetime' ? 'desc' : 'asc';
-                    }
-                    sortAssessmentData(assessmentCurrentSort.column, assessmentCurrentSort.direction);
-                    renderAssessmentHistoryTable(assessmentHistoryData);
-                    updateAssessmentSortUI(header);
-                });
-            });
-            sortAssessmentData(assessmentCurrentSort.column, assessmentCurrentSort.direction); 
-            renderAssessmentHistoryTable(assessmentHistoryData);
-            assessmentHistoryHeaders.forEach(header => {
-                if (header.dataset.sort === assessmentCurrentSort.column) {
-                     updateAssessmentSortUI(header);
-                }
-            });
-        }
-    } // End of initializeAssessmentScripts()
-    
-
     // --- Problem List Modal (Tagging Section) ---
-    const categoryData = {
-        "common": [ { term: "Depressed", tags: "TAG A, TAG B" }, { term: "Loss of appetile", tags: "TAG A, TAG C" }, { term: "Acute Vomitting", tags: "TAG B, TAG D" }, { term: "Chronic Vomitting", tags: "TAG B, TAG E" }, { term: "Respiratory distress", tags: "TAG F" }, { term: "Lameness", tags: "TAG G" }, { term: "Dental tartar", tags: "TAG H" } ],
-        "eye": [ { term: "Corneal ulcer", tags: "Eye, Trauma" }, { term: "Glaucoma", tags: "Eye, Chronic" }, { term: "Uveitis", tags: "Eye, Inflammation" }, { term: "Cataract", tags: "Eye, Age" } ],
-        "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term: "Aural hematoma", tags: "Ear, Trauma" } ],
-        "nose": [ { term: "Nasal discharge", tags: "Nose, Symptom" }, { term: "Sneezing", tags: "Nose, Symptom" } ],
-        "throat": [ { term: "Coughing", tags: "Throat, Symptom" }, { term: "Pharyngitis", tags: "Throat, Inflammation" } ],
-        "abdomen": [ { term: "Abdominal pain", tags: "Abdomen, Symptom" }, { term: "Diarrhea", tags: "Abdomen, GI" }, { term: "Foreign body", tags: "Abdomen, GI" } ],
-        "trauma": [ { term: "Laceration", tags: "Trauma, Skin" }, { term: "Hit by car", tags: "Trauma, HBC" } ],
-        "bone": [ { term: "Fracture", tags: "Bone, Trauma" }, { term: "Arthritis", tags: "Bone, Chronic" } ],
-        "behavier": [ { term: "Aggression", tags: "Behavior" }, { term: "Anxiety", tags: "Behavior" } ]
-    };
-
+    // (ย้าย Logic เข้ามาใน DOMContentLoaded เพราะ Element อยู่ใน index.html)
     const categoryList = document.getElementById('category-list');
     const categoryItems = categoryList ? categoryList.querySelectorAll('li[data-category-id]') : [];
     const resultTableBody = document.getElementById('result-table-body');
@@ -944,6 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderResultTable(categoryId);
             });
         });
+        // Render 'common' category by default when modal is opened (or on page load)
         renderResultTable('common');
     }
     
