@@ -489,22 +489,21 @@ function initializeTabSwitching() {
             // 1. โหลดเนื้อหาใหม่
             loadModuleContent(targetFile);
 
-            // 2. อัปเดต UI ของ Tab
-            emrTabs.forEach(t => {
-                // จัดการลิงก์ที่ไม่มี data-target (เช่น sysexam_v2.html)
-                if (t.href && !t.dataset.target) {
-                    t.classList.remove('tab-active');
-                    t.classList.add('tab-inactive');
-                } else if (t.dataset.target) {
-                     t.classList.replace('tab-active', 'tab-inactive');
-                }
+            // 2. (FIX) อัปเดต UI ของ Tab
+            // ลบ active ออกจาก tab อื่นทั้งหมด (รวมถึง non-emr-tab links)
+            document.querySelectorAll('.emr-tab').forEach(t => {
+                // บังคับสไตล์ inactive
+                t.classList.remove('tab-active', 'dark:text-[--color-primary-500]', 'dark:border-[--color-primary-500]');
+                t.classList.add('tab-inactive', 'dark:text-[--color-text-muted]');
             });
-            this.classList.replace('tab-inactive', 'tab-active');
+            
+            // เพิ่ม active ให้กับ Tab ที่คลิกเท่านั้น
+            this.classList.remove('tab-inactive', 'dark:text-[--color-text-muted]');
+            this.classList.add('tab-active', 'dark:text-[--color-primary-500]', 'dark:border-[--color-primary-500]');
         });
     });
 }
 // +++ END: EMR Tab Switching Logic (NEW - MOVED TO GLOBAL SCOPE) +++
-
 
 // +++ START: Assessment-related Functions (NEW - MOVED TO GLOBAL SCOPE) +++
 // (ฟังก์ชัน 3 ตัวนี้ ถูกย้ายออกมาจาก DOMContentLoaded)
